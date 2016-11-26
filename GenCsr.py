@@ -1,6 +1,7 @@
 
 # -*- coding: utf-8 -*-
 """
+Python 3 Compatible
 http://stackoverflow.com/questions/10406135
 /unicodedecodeerror-ascii-codec-cant-decode-byte-0xd1-in-position-2-ordinal
 

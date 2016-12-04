@@ -4,6 +4,7 @@
 USAGE:
 This returns the result as a list of dictionaries
 each dictionary contain the column name and value of one row of result
+compatible with python 3
 __maintainer__ = 'Debaditya'
 '''
 

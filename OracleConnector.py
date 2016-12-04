@@ -14,7 +14,7 @@ import cx_Oracle
 
 class opendb(object):
 
-    def __init__(self,dbinfodict={'uname':'apps','password':'password','ip':'10.204.145.18','service':'ECASQAODD'}):
+    def __init__(self,dbinfodict={'uname':'apps','password':'password','ip':'10.204.xx.xx','service':'xxxxxx'}):
         self.dbinfodict = dbinfodict
         connectionString = '{username}/{password}@{ip}/{service}'.format(
             username=self.dbinfodict['uname'],

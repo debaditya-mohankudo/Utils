@@ -1,22 +1,11 @@
 
 # -*- coding: utf-8 -*-
-"""
-Python 3 Compatible ( Not compatible with python 2)
-http://stackoverflow.com/questions/10406135
-/unicodedecodeerror-ascii-codec-cant-decode-byte-0xd1-in-position-2-ordinal
-
-OPENSSL documentation :
-    https://www.openssl.org/docs/apps/req.html ( for utf8)
-"""
 
 
 import os
 import time
 import codecs
 import subprocess
-
-INTERNAL_ORG_DOMAIN = ('abcdef.com')
-
 
 
 class GenCsr(object):
@@ -38,7 +27,7 @@ class GenCsr(object):
             'abc.com','org','o','locality','state','IN',2048,'sha256')
 
     the private key and csr stored as /csr/cn.key and /csr/cn.csr
-    __maintainer__ = 'debaditya'
+    __maintainer__ = 'debaditya_mohankudo@symantec.com'
 
     '''
     # support added for multiple sans in csr
@@ -49,8 +38,7 @@ class GenCsr(object):
 
     def __init__(self, debug=True, save_key=True):
         if not os.path.isdir('csr'): os.mkdir('csr')
-        dir_t = str(time.time()+time.perf_counter())
-        fpath = os.path.join('.', 'csr', dir_t)  # creates .\csr ( os wise)
+        fpath = os.path.join('.', 'csr')  # creates .\csr ( os wise)
         if not os.path.exists(fpath): os.mkdir(fpath)
         self.debug = debug
         self.save_key = save_key
@@ -79,7 +67,6 @@ class GenCsr(object):
 
     def _gen_openssl_conf(self):
         f = codecs.open(self.conf_path, 'w', 'utf-8')
-
         f.write('[ req ]\
                 {nl}default_bits={keysize}\
                 {nl}prompt = no\
@@ -108,7 +95,7 @@ class GenCsr(object):
             f.write('\nST = {state}'.format(state=self.ST))
         if self.C:
             f.write('\nC = {country}'.format(country=self.C))
-        f.write('\nemailAddress = debaditya@xxxxx.com')
+        f.write('\nemailAddress = debaditya_mohankudo@symantec.com')
         if sanincsrFlag:
             f.write('{nl}[req_ext]\
                      {nl}subjectAltName = @alt_names{nl}\
@@ -123,7 +110,7 @@ class GenCsr(object):
 
     def _gen_csr(self):
         self.csr = None
-
+        #self._clean_old_files()
         self._gen_openssl_conf()
         func_call_dict = {'DSA': self._gen_dsa_keypair,
                           'ECC': self._gen_ecc_keypair,
@@ -142,7 +129,7 @@ class GenCsr(object):
                         keyfile=self.pvtkey_path,
                         csrfile=self.csr_path,
                         configfile=self.conf_path)
-        subprocess.call(csrGenCommand)
+        subprocess.call(csrGenCommand, shell=True)
         self.print_log(csrGenCommand)
         counter = 0
         while not os.path.isfile(self.csr_path) and counter < max_sleep:
@@ -155,7 +142,7 @@ class GenCsr(object):
                {nl}private key saved in file :{nl} {keyfile}'.format(
                 nl='\n',
                 csrfile=os.path.abspath(self.csr_path),
-                keyfile=os.path.abspath(self.pvtkey_path)))
+                keyfile=os.path.abspath(self.pvtkey_path)))            
         self._read_csr_from_file()
 
     def _gen_dsa_keypair(self):
@@ -166,19 +153,19 @@ class GenCsr(object):
         self.print_log('dsa param\n{dsaParamGenCommand}\ndsa pvtkey\n{dsaPvtKeyGenCommand}\n'.format(
             dsaParamGenCommand=dsaParamGenCommand,
             dsaPvtKeyGenCommand=dsaPvtKeyGenCommand))
-        subprocess.call(dsaParamGenCommand)
-        subprocess.call(dsaPvtKeyGenCommand)
+        subprocess.call(dsaParamGenCommand, shell=True)
+        subprocess.call(dsaPvtKeyGenCommand, shell=True)
 
     def _gen_ecc_keypair(self):
         if str(self.Key_Size).isdigit():
             self.Key_Size = 'prime256v1'
         eccParamGenCommand = "openssl ecparam -name " + self.Key_Size + "  -genkey -out " + self.pvtkey_path
         self.print_log('EC Param Generation\n{}'.format(eccParamGenCommand))
-        subprocess.call(eccParamGenCommand)
+        subprocess.call(eccParamGenCommand, shell=True)
 
     def _gen_rsa_keypair(self):
         rsaPvtKeyGenCommand = "openssl genrsa -out " +self.pvtkey_path + " " + self.Key_Size 
-        subprocess.call(rsaPvtKeyGenCommand)
+        subprocess.call(rsaPvtKeyGenCommand, shell=True)
         self.print_log('RSA Private Key Generation\n{}'.format(rsaPvtKeyGenCommand))
 
     def _read_csr_from_file(self):
@@ -202,8 +189,6 @@ class GenCsr(object):
         self.Sig_Alg = Signing_Algorithm
         self.Key_Size = str(keysize)
         self.hash_alg = hash_alg
-        if not self.internal_domain:
-            print('{warning}'.format(warning='Your domain not in CAS approved Domain. Good to use from internal domains: \n'+ str(INTERNAL_ORG_DOMAIN) ))
         self._gen_csr()
         # comment the line below to save the pvt key file
         if not self.save_key:
@@ -248,42 +233,11 @@ class GenCsr(object):
         return self.get_csr(CN, O, OU, L, ST, C, 'ECC',
                             curve_name, hash_alg, SanInCSR)
 
-    @property
-    def fqdn(self):
-        if '.' not in self.CN:
-            return False
-        elif self.CN.replace('.', '').isdigit():
-            return False
-        else:
-            return True
-
-    @property
-    def internal_domain(self):
-        status = []
-        if self.CN:
-            for domain in INTERNAL_ORG_DOMAIN:
-                if not domain.lower() in self.CN.lower():
-                    status.append(False)
-                else:
-                    status.append(True)
-        if self.SanInCSR:
-            for domain in INTERNAL_ORG_DOMAIN:
-                for cn in self.SanInCSR:
-                    if not domain.lower() in cn.lower():
-                        status.append(False)
-                    else:
-                        status.append(True)
-
-        if True in status:
-            return True
-        else:
-            return False
-
 
 if __name__ == "__main__":
 
     x1 = GenCsr() # DO NOT DELETE/COMMENT THIS
+     
+    print(x1.type_RSA('仮名交じり文.digicert.com','Debaditya','OrganUnitFebWed05222657','locality','state','IN',2048,'sha1', ['san1.com, san2.com']))
+    print(x1.type_ECC('仮名交じり文.digicert.com','DigiCert Inc.','OrganUnitFebWed05222657','locality','state','IN',2048,'sha1', ['san1.com, san2.com']))
 
-    print(x1.type_RSA('checkev2yct.bbtedst.net','org','orgunit','Mountain View','California','US',2048,'sha256'))
-
-#pull request d3mo

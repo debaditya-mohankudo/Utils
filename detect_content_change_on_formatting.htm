@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang=”en”>
+    <head>
+        <meta charset="utf-8">
+        <title>Hello World</title>
+    </head>
+    <body>
+    	<textarea id="old"  rows="30" cols="200"  style="width:40%; height:auto; ">old_code</textarea>
+    	<textarea id="new" rows="30" cols="200"  style="width:40%; height:auto; ">new_code</textarea>
+    	<textarea id="result" rows="20" cols="200"  style="width:80%; height:auto; ">&nbsp;</textarea>
+    	<br/>
+    	<br/>
+    	<button class="button" id="submit"  onclick="compare_content()">
+    	Compare
+        </button>
+    </body>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.1/jquery.min.js"></script>
+    <script type="text/javascript">
+    	function compare_content() {
+    		source_code_sans_space_concatenated = function(text) {
+    			var all_lines = text.split('\n');
+    			var all_lines_concatenated = '';
+    			$.each(all_lines, function(i, v) {
+    				all_lines_concatenated += v;
+    			})
+
+    			return all_lines_concatenated.trim();
+    		};
+    		var source_code_new = source_code_sans_space_concatenated($('#new').val()).split('');
+    		var source_code_old = source_code_sans_space_concatenated($('#old').val()).split('');
+            var max_length = source_code_old.length; // in case both are same length
+
+			if (source_code_new.length > source_code_old.length)	 {
+				console.log('length mismatch');
+			}
+			get_mismatch_line_no = function(source_locator, char_index) {
+    						var all_lines = $(source_locator).val().split('\n');
+    						var current_concatenated_length = 0;
+    						for (var line_no = 0; line_no < all_lines.length; line_no++) {
+    							current_concatenated_length += all_lines[line_no].length;
+    							if(current_concatenated_length > (char_index+1)) {
+    								break;
+    							}
+    							
+    						}
+    						return line_no;
+    			};
+    		
+    		for (var i = 0; i < max_length; i++) {
+    			var output = '';
+    			(function(char_index) {
+    				if(source_code_old[char_index] != source_code_new[char_index]) {
+    					output += '\n mismatch of content detected :::';
+    					output += '\n old code ::::' + source_code_old[char_index];
+    					output += '\n new code ::::' + source_code_new[char_index];
+    					output += '\n OLD source code mismatch detected at line no ::: ' + get_mismatch_line_no('#old', char_index);
+                        $('#result').val($('#result').val() + output);
+    					
+    				}
+    				
+    			})(i);
+    			if(output.length > 1) {
+    				return;
+    			}
+
+    		}
+        }
+    
+    	
+    </script>
+</html>

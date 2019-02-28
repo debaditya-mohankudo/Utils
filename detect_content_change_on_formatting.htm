@@ -2,7 +2,7 @@
 <html lang=”en”>
     <head>
         <meta charset="utf-8">
-        <title>Hello World</title>
+        <title>Detect Content Change</title>
     </head>
     <body>
     	<textarea id="old"  rows="30" cols="200"  style="width:40%; height:auto; ">old_code</textarea>
@@ -28,7 +28,7 @@
     		};
     		var source_code_new = source_code_sans_space_concatenated($('#new').val()).split('');
     		var source_code_old = source_code_sans_space_concatenated($('#old').val()).split('');
-            var max_length = source_code_old.length; // in case both are same length
+                var max_length = source_code_old.length; // in case both are same length
 
 			if (source_code_new.length > source_code_old.length)	 {
 				console.log('length mismatch');

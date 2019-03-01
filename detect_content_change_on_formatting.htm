@@ -31,22 +31,22 @@
     		};
     		var source_code_new = source_code_sans_space_concatenated($('#new').val()).split('');
     		var source_code_old = source_code_sans_space_concatenated($('#old').val()).split('');
-                var max_length = source_code_old.length; // in case both are same length
+            var max_length = source_code_old.length - source_code_new.length? source_code_old.length : source_code_new.length
 
-			if (source_code_new.length > source_code_old.length)	 {
-				console.log('length mismatch');
+			if (source_code_new.length != source_code_old.length)	 {
+				 $('#result').val('Length of content mismatch');
 			}
 			get_mismatch_line_no = function(source_locator, char_index) {
     						var all_lines = $(source_locator).val().split('\n');
     						var current_concatenated_length = 0;
     						for (var line_no = 0; line_no < all_lines.length; line_no++) {
     							current_concatenated_length += all_lines[line_no].length;
-    							if(current_concatenated_length > (char_index+1)) {
+    							if(current_concatenated_length >= (char_index+1)) {
     								break;
     							}
     							
     						}
-    						return line_no;
+    						return line_no + 1;
     			};
     		
     		for (var i = 0; i < max_length; i++) {

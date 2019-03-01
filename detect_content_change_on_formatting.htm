@@ -5,14 +5,17 @@
         <title>Detect Content Change</title>
     </head>
     <body>
-    	<textarea id="old"  rows="30" cols="200"  style="width:40%; height:auto; ">old_code</textarea>
-    	<textarea id="new" rows="30" cols="200"  style="width:40%; height:auto; ">new_code</textarea>
-    	<textarea id="result" rows="20" cols="200"  style="width:80%; height:auto; ">&nbsp;</textarea>
+    	<textarea id="old"  rows="30" cols="100" style="width:40%; height:auto; background-color: lightyellow;">old_code</textarea>
+    	<textarea id="new"  rows="30" cols="100" style="width:40%; height:auto; background-color: lightblue;">new_code</textarea>
+    	<br/><br/>
+    	<label> Result </label>
+    	<br/>
+    	<textarea id="result" 
+    	          rows="20" cols="100"  
+    	          style="width:81%; height:auto; background-color: lightgrey;">&nbsp;</textarea>
     	<br/>
     	<br/>
-    	<button class="button" id="submit"  onclick="compare_content()">
-    	Compare
-        </button>
+    	<button class="button" id="submit"  onclick="compare_content()">Compare</button>
     </body>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.1/jquery.min.js"></script>
     <script type="text/javascript">
@@ -51,9 +54,10 @@
     			(function(char_index) {
     				if(source_code_old[char_index] != source_code_new[char_index]) {
     					output += '\n mismatch of content detected :::';
-    					output += '\n old code ::::' + source_code_old[char_index];
-    					output += '\n new code ::::' + source_code_new[char_index];
-    					output += '\n OLD source code mismatch detected at line no ::: ' + get_mismatch_line_no('#old', char_index);
+    					output += '\n original code ::::' + source_code_old[char_index];
+    					output += '\n formatted ::::' + source_code_new[char_index];
+    					output += '\n Original source code mismatch detected at line no ::: ' + get_mismatch_line_no('#old', char_index);
+    					output += '\n Formatted source code mismatch detected at line no ::: ' + get_mismatch_line_no('#new', char_index);
                         $('#result').val($('#result').val() + output);
     					
     				}

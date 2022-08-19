@@ -1,24 +1,23 @@
-import docker # pip install docker
-client = docker.from_env()
+from python_on_whales import docker
 
 # stop all containers
-for container in client.containers.list():
+for container in docker.container.list(all=True):
     print('stopping...', container.name)
     container.stop()
     container.remove()
-client.containers.prune()
+docker.container.prune()
 
 # remove all networks
-for network in client.networks.list():
+for network in docker.network.list():
     if network.name in ('none', 'bridge', 'host'):
         pass
     else:
         print('network removed', network.name)
         network.remove()
-client.networks.prune()
+docker.network.prune()
 
 # remove all volumes
-for volume in client.volumes.list():
-    print('remove volume', volume.id)
+for volume in docker.volume.list():
+    print('remove volume', volume.name)
     volume.remove()
-client.volumes.prune()
+docker.volume.prune()

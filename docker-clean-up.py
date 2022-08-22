@@ -21,3 +21,11 @@ for volume in docker.volume.list():
     print('remove volume', volume.name)
     volume.remove()
 docker.volume.prune()
+
+# remove all images with None tag
+for image in docker.image.list():
+    if image.repo_tags == []:
+        print(image.repo_tags, image.size // (1024 * 1024), 'MB')
+        print('removing image with no tags')
+        image.remove(prune=True)
+   

@@ -1,12 +1,13 @@
 import socket
 import time
+from tqdm import tqdm
 
 while True:
 	try:
 		IPaddress=socket.gethostbyname("repo.dev.tgp.digicert.com")
 		print("Connected, with the url: "+ "repo.dev.tgp.digicert.com"  + '-' + time.ctime())
+		for i in tqdm (range (15), desc="Sleeping..."):
+			time.sleep(1)
+
 	except socket.gaierror:
 		print("No connection")
-	
-	time.sleep(15)
-	print(int(time.time() % 100) * '-')

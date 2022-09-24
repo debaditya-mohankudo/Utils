@@ -238,6 +238,6 @@ if __name__ == "__main__":
 
     x1 = GenCsr() # DO NOT DELETE/COMMENT THIS
      
-    print(x1.type_RSA('仮名交じり文.digicert.com','Debaditya','OrganUnitFebWed05222657','locality','state','IN',2048,'sha1', ['san1.com, san2.com']))
+    print(x1.type_RSA('','Debaditya','OrganUnitFebWed05222657','locality','state','IN',4096,))
     print(x1.type_ECC('仮名交じり文.digicert.com','DigiCert Inc.','OrganUnitFebWed05222657','locality','state','IN',2048,'sha1', ['san1.com, san2.com']))
 

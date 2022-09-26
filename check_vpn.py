@@ -13,5 +13,6 @@ while True:
 			time.sleep(1)
 
 	except socket.gaierror:
+		start = time.time()
 		print("No connection")
 		time.sleep(15)

@@ -2,7 +2,8 @@ from python_on_whales import docker
 
 # pause all containers
 for container in docker.container.list(all=True):
-    docker.pause(container)
+    if container.state.status != 'paused':
+        docker.pause(container)
 
 # stop all containers
 for container in docker.container.list(all=True):

@@ -1,5 +1,9 @@
 from python_on_whales import docker
 
+# pause all containers
+for container in docker.container.list(all=True):
+    docker.pause(container)
+
 # stop all containers
 for container in docker.container.list(all=True):
     print('stopping...', container.name)

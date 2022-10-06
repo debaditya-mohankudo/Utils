@@ -41,11 +41,16 @@ def unpause():
 
 @app.command()
 def clean():
-    for container in docker.container.list(all=True):
-        if container.state.status == 'running':
-            docker.pause(container)
+    delete = typer.confirm("Are you sure you want to stop/remove  all containers?")
+    if delete:
+        print('Stop/remove all containers')
 
-        # stop all containers
+        for container in docker.container.list(all=True):
+            if container.state.status == 'running':
+                docker.pause(container)
+                docker.network.disconnect('digicert_docker_default',container=container)
+                
+        # stop/remove all containers
         for container in docker.container.list(all=True):
             print('stopping...', container.name)
             container.stop()
@@ -73,7 +78,8 @@ def clean():
                 print(image.repo_tags, image.size // (1024 * 1024), 'MB')
                 print('removing image with no tags')
                 image.remove(prune=True)
-        
+    else:
+        print("Aborting operation")
 
 if __name__ == "__main__":
     app()

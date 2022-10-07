@@ -23,7 +23,6 @@ async def producer(queue, i):
  
 async def consumer(queue):
     while True:
-        await asyncio.sleep(3)
         #print(queue.qsize())
         try:
             result, i = await queue.get()

@@ -42,12 +42,12 @@ async def main():
     producers = [asyncio.create_task(producer(queue, _))
                  for _ in range(TOTAL_REQUESTS)]
     consumers = [asyncio.create_task(consumer(queue))
-                 for _ in range(2)]
+                 for _ in range(CONCURRENT_REQUESTS)]
  
     # with both producers and consumers running, wait for
     # the producers to finish
     await asyncio.gather(*producers)
-    print('---- done producing')
+    #print('---- done producing')
  
     # wait for the remaining tasks to be processed
     await queue.join()

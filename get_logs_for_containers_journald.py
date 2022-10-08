@@ -43,7 +43,7 @@ def print_logs_from_stream(logs_stream: Popen, container_name: Optional[str]) ->
     color = Fore.WHITE
     while True:
         log = json.loads(logs_stream.stdout.readline())
-        line = f"{log['CONTAINER_NAME']} {log['MESSAGE']}"
+        line = f"{log.get('CONTAINER_NAME', '')} {log.get('MESSAGE', '')}"
         if len(log) != 0:
             if 'INFO' in line.upper():
                 color = Fore.GREEN

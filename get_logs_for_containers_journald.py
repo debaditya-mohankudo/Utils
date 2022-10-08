@@ -39,7 +39,7 @@ def follow_logs(container_name: Optional[str] = None) -> None:
 def print_in_color(color: Fore, text: str) -> None:
     print(f"{color} {text} {Style.RESET_ALL}")
 
-def print_logs_from_stream(logs_stream, container_name: Optional[str]) -> None:
+def print_logs_from_stream(logs_stream: Popen, container_name: Optional[str]) -> None:
     color = Fore.WHITE
     while True:
         log = json.loads(logs_stream.stdout.readline())
@@ -51,7 +51,7 @@ def print_logs_from_stream(logs_stream, container_name: Optional[str]) -> None:
                 color = Fore.YELLOW
             elif 'EXCEPTION' in line.upper():
                 color = Fore.RED
-        
+
             print_in_color(color, line)
         else:
             time.sleep(1)
@@ -75,6 +75,7 @@ def tail_logs_from_container(container_name: Optional[str] = None) -> None:
     print(f"Running command: {command}")
     
     docker_logs_stream = Popen(command, stdout=PIPE)
+    print(type(docker_logs_stream))
 
     print_logs_from_stream(docker_logs_stream, container_name)
 

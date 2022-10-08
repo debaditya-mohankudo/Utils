@@ -13,7 +13,7 @@ Options:
 '''
 
 
-
+import json
 import typer
 import time
 
@@ -36,23 +36,23 @@ app = typer.Typer()
 def follow_logs(container_name: Optional[str] = None) -> None:
     tail_logs_from_container(container_name)
 
-def print_in_color(color: Fore, text: str):
+def print_in_color(color: Fore, text: str) -> None:
     print(f"{color} {text} {Style.RESET_ALL}")
 
-def print_logs_from_stream(logs_stream, container_name: Optional[str]):
+def print_logs_from_stream(logs_stream, container_name: Optional[str]) -> None:
     color = Fore.WHITE
     while True:
-        log = logs_stream.stdout.readline().decode('utf-8')
+        log = json.loads(logs_stream.stdout.readline())
+        line = f"{log['CONTAINER_NAME']} {log['MESSAGE']}"
         if len(log) != 0:
-            if 'INFO' in log.upper():
+            if 'INFO' in line.upper():
                 color = Fore.GREEN
-            elif 'WARNING' in log.upper():
+            elif 'WARNING' in line.upper():
                 color = Fore.YELLOW
-            elif 'EXCEPTION' in log.upper():
+            elif 'EXCEPTION' in line.upper():
                 color = Fore.RED
-
-            print_in_color(Fore.WHITE, f"{container_name}")
-            print_in_color(color, log)
+        
+            print_in_color(color, line)
         else:
             time.sleep(1)
 
@@ -64,6 +64,7 @@ def tail_logs_from_container(container_name: Optional[str] = None) -> None:
         "--no-host", 
         "-u", "docker",
         "-f",
+        "-o", "json",
     
         #"-n", "1"
     ]

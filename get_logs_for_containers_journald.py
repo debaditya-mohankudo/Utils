@@ -12,13 +12,22 @@ Options:
 
 '''
 
-import time
-import typer
 
+
+import typer
+import time
+
+from ast import For
+from pyparsing import col
+from colorama import Fore
+from colorama import Style
 from psutil import Popen
 from subprocess import PIPE
-from typing import List, Optional
+from typing import Optional
 
+
+
+print(f"This is best viewd in {Fore.WHITE} BLACK COLOR BACKGROUND TERMINAL{Style.RESET_ALL}!")
 
 
 app = typer.Typer()
@@ -27,13 +36,25 @@ app = typer.Typer()
 def follow_logs(container_name: Optional[str] = None) -> None:
     tail_logs_from_container(container_name)
 
-def print_logs_from_stream(logs_stream):
+def print_in_color(color: Fore, text: str):
+    print(f"{color} {text} {Style.RESET_ALL}")
+
+def print_logs_from_stream(logs_stream, container_name: Optional[str]):
+    color = Fore.WHITE
     while True:
-        log = logs_stream.stdout.readline()
+        log = logs_stream.stdout.readline().decode('utf-8')
         if len(log) != 0:
-            print('-' * 20)
-            print(f"{log.decode('utf-8')}") # log is in bytes
-            time.sleep(.1)
+            if 'INFO' in log.upper():
+                color = Fore.GREEN
+            if 'WARNING' in log.upper():
+                color = Fore.YELLOW
+            if 'EXCEPTION' in log.upper():
+                color = Fore.RED
+
+            print_in_color(Fore.WHITE, f"{container_name}")
+            print_in_color(color, log)
+        else:
+            time.sleep(1)
 
 def tail_logs_from_container(container_name: Optional[str] = None) -> None:
     command = [ "journalctl", 
@@ -54,7 +75,7 @@ def tail_logs_from_container(container_name: Optional[str] = None) -> None:
     
     docker_logs_stream = Popen(command, stdout=PIPE)
 
-    print_logs_from_stream(docker_logs_stream)
+    print_logs_from_stream(docker_logs_stream, container_name)
 
 
 if __name__ == "__main__":

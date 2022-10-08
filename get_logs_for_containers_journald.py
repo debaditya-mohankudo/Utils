@@ -46,9 +46,9 @@ def print_logs_from_stream(logs_stream, container_name: Optional[str]):
         if len(log) != 0:
             if 'INFO' in log.upper():
                 color = Fore.GREEN
-            if 'WARNING' in log.upper():
+            elif 'WARNING' in log.upper():
                 color = Fore.YELLOW
-            if 'EXCEPTION' in log.upper():
+            elif 'EXCEPTION' in log.upper():
                 color = Fore.RED
 
             print_in_color(Fore.WHITE, f"{container_name}")

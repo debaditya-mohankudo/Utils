@@ -25,23 +25,25 @@ app = typer.Typer()
 def follow_logs(cnames: List[str]) -> None:
     tail_logs_from_container(cnames)
 
-def print_in_color(color: Fore, text: str) -> None:
-    print(f"{color} {text} {Style.RESET_ALL}")
+def print_in_color(color: Fore, message: str, container_name: str) -> None:
+    print(f"{Fore.WHITE} {container_name} {Style.RESET_ALL}")
+    print(f"{color} {message} {Style.RESET_ALL}")
 
 def print_logs_from_stream(logs_stream: Popen) -> None:
-    color = Fore.WHITE
+    color = Fore.CYAN
     while True:
         log = json.loads(logs_stream.stdout.readline())
-        line = f"{log.get('CONTAINER_NAME', '')} {log.get('MESSAGE', '')}"
+
+        line = f"{log.get('MESSAGE', '')}"
         if len(log) != 0:
-            if 'INFO' in line.upper():
+            if 'INFO' in line:
                 color = Fore.GREEN
-            elif 'WARNING' in line.upper():
+            elif 'WARNING' in line:
                 color = Fore.YELLOW
             elif 'EXCEPTION' in line.upper():
                 color = Fore.RED
 
-            print_in_color(color, line)
+            print_in_color(color, log.get('MESSAGE', ''), log.get('CONTAINER_NAME', ''))
         else:
             time.sleep(1)
 

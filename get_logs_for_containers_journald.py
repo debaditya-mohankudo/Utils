@@ -20,7 +20,7 @@ def follow_logs(c: Optional[List[str]] = typer.Option([])) -> None:
     if c:
         tail_logs_from_container(c)
     else:
-        tail_logs_from_container()
+        tail_logs_from_container([])
 
 def print_in_color(color: Fore, message: str, container_name: str) -> None:
     print(f"{Fore.WHITE} {container_name} {Style.RESET_ALL}")

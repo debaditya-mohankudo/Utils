@@ -1,6 +1,8 @@
 import socket
 import time
-from tqdm import tqdm # pip install tqdm
+
+from rich.progress import track # pip install rich
+
 duration_to_check_sec = 30
 
 start = time.time()
@@ -11,7 +13,7 @@ while True:
 		print("")
 		print(f"=<>= Connected to : repo.dev.tgp.digicert.com For  {(time.time() - start)}s")
 		print("")
-		for i in tqdm (range (duration_to_check_sec), desc="Sleeping..."):
+		for i in track(range (duration_to_check_sec), description="Sleeping..."):
 			time.sleep(1)
 
 	except socket.gaierror:

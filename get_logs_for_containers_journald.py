@@ -1,6 +1,7 @@
 
 '''Usage
-python ~/workspace/Utils/get_logs_for_containers_journald.py  container_name1 contianer_name2 ...  
+python ~/workspace/Utils/get_logs_for_containers_journald.py  --c container_name1 --c contianer_name2 ...  
+python ~/workspace/Utils/get_logs_for_containers_journald.py # gets all container logs
 '''
 import json
 import typer
@@ -12,16 +13,14 @@ from psutil import Popen
 from subprocess import PIPE
 from typing import List, Optional
 
-
-
 print(f"This is best viewd in {Fore.WHITE} BLACK COLOR BACKGROUND TERMINAL{Style.RESET_ALL}!")
 
 
-app = typer.Typer()
-
-@app.command()
-def follow_logs(cnames: Optional[List[str]] = []) -> None:
-    tail_logs_from_container(cnames)
+def follow_logs(c: Optional[List[str]] = typer.Option([])) -> None:
+    if c:
+        tail_logs_from_container(c)
+    else:
+        tail_logs_from_container()
 
 def print_in_color(color: Fore, message: str, container_name: str) -> None:
     print(f"{Fore.WHITE} {container_name} {Style.RESET_ALL}")
@@ -45,7 +44,7 @@ def print_logs_from_stream(logs_stream: Popen) -> None:
         else:
             time.sleep(1)
 
-def tail_logs_from_container(container_names: Optional[List[str]] = []) -> None:
+def tail_logs_from_container(container_name: List[str]) -> None:
     command = [ "journalctl", 
         "--since", 
         "5 seconds ago", 
@@ -58,7 +57,8 @@ def tail_logs_from_container(container_names: Optional[List[str]] = []) -> None:
         #"-n", "1"
     ]
 
-    for c in container_names:
+    for c in container_name:
+
         command.append( f"CONTAINER_NAME={c}")
 
     print(f"Running command: {command}")
@@ -69,4 +69,4 @@ def tail_logs_from_container(container_names: Optional[List[str]] = []) -> None:
 
 
 if __name__ == "__main__":
-    app()
+    typer.run(follow_logs)

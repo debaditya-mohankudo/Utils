@@ -2,6 +2,7 @@ import socket
 import time
 
 from rich.progress import track # pip install rich
+from rich import print
 
 duration_to_check_sec = 30
 
@@ -11,7 +12,7 @@ while True:
 		print("\033c", end="") # to clear the terminal using python (edited) 
 		IPaddress=socket.gethostbyname("repo.dev.tgp.digicert.com")
 		print("")
-		print(f"=<>= Connected to : repo.dev.tgp.digicert.com For  {(time.time() - start)}s")
+		print(f"=<>= Connected to : repo.dev.tgp.digicert.com For  {int((time.time() - start))}s")
 		print("")
 		for i in track(range (duration_to_check_sec), description="Sleeping..."):
 			time.sleep(1)

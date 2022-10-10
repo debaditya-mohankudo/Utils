@@ -6,13 +6,11 @@ import json
 import typer
 import time
 
-from ast import For
-from pyparsing import col
 from colorama import Fore
 from colorama import Style
 from psutil import Popen
 from subprocess import PIPE
-from typing import Optional, List
+from typing import List, Optional
 
 
 
@@ -22,7 +20,7 @@ print(f"This is best viewd in {Fore.WHITE} BLACK COLOR BACKGROUND TERMINAL{Style
 app = typer.Typer()
 
 @app.command()
-def follow_logs(cnames: List[str]) -> None:
+def follow_logs(cnames: Optional[List[str]] = []) -> None:
     tail_logs_from_container(cnames)
 
 def print_in_color(color: Fore, message: str, container_name: str) -> None:
@@ -47,7 +45,7 @@ def print_logs_from_stream(logs_stream: Popen) -> None:
         else:
             time.sleep(1)
 
-def tail_logs_from_container(container_names: List[str]) -> None:
+def tail_logs_from_container(container_names: Optional[List[str]] = []) -> None:
     command = [ "journalctl", 
         "--since", 
         "5 seconds ago", 

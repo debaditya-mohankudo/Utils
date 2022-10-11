@@ -1,31 +1,39 @@
 import asyncio, httpx, time
+import uvloop
 
+asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 start = time.time()
 print(start)
 
-CONCURRENT_REQUESTS = 100 # ~ parallel requests 
-TOTAL_REQUESTS = 100
+CONCURRENT_REQUESTS = 50 # ~ parallel requests 
+TOTAL_REQUESTS = 200
+
+LOG = dict()
  
-cc_auth = {'X-DC-DEVKEY': "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"}
-end_point = 'https://localhost.xxxxxxxxxx.com/services/v2/order/certificate/277670380'
+# cc_auth = {'X-DC-DEVKEY': "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"}
+# end_point = 'https://localhost.xxxxxxxxxx.com/services/v2/order/certificate/277670380'
+
+end_point = 'http://localhost:8000/items/1'
 
 async def request_api(i):
     async with httpx.AsyncClient() as client:
-        print(f"sending:: {i}  {time.time()}")
-        return await client.get(end_point, headers=cc_auth)
+        r = await client.get(end_point)
+        return r
 
-async def producer(queue, i):
+async def producer(queue: asyncio.Queue, i):
     r = await request_api(i)
+    # LOG[time.time()] = f"Pushing into queue:: {i}"
     await queue.put((r, i))
  
-async def consumer(queue):
+async def consumer(queue: asyncio.Queue):
     while True:
         try:
             result, i = await queue.get()
-            print(f"received ::{i}  {time.time()} with http status code {result.status_code}")
+            #LOG[time.time()] = f'DEBUG: queue size is now {queue.qsize()}'
+            LOG[time.time()] = f"received:: {i}  with http status code:: {result.status_code} time taken:: {result.elapsed.microseconds // 1000} ms"
         except Exception as exc:
-            print('generated an exception: %s' % ( exc))
+            LOG[f'{i} generated an exception: {exc}']
         
         queue.task_done()
 
@@ -47,11 +55,17 @@ async def main():
     await queue.join()
     end_time = time.time()
 
-    print(f"Time taken:: {(end_time - start_time)}s")
- 
     # cancel the consumers, which are now idle
     for c in consumers:
         c.cancel()
 
+    for k, v in sorted(LOG.items()):
+        print(f'{k} -> {v}')
+
+    print('-' * 20)
+    print(f"Time taken:: {(end_time - start_time)}s for {TOTAL_REQUESTS} requests")
+    print('-' * 20)
+
 if __name__ == "__main__":
     asyncio.run(main())
+    

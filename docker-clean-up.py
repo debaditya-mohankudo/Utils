@@ -48,7 +48,6 @@ def clean():
         for container in docker.container.list(all=True):
             if container.state.status == 'running':
                 docker.pause(container)
-                docker.network.disconnect('digicert_docker_default',container=container)
                 
         # stop/remove all containers
         for container in docker.container.list(all=True):

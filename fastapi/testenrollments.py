@@ -1,6 +1,7 @@
 import asyncio
 from httpx import AsyncClient, Limits
 import time
+import uvloop
 
 REQUESTS = 100
 
@@ -76,7 +77,8 @@ async def request_api(client: AsyncClient, i: int):
 
 
 async def main():
-    async with AsyncClient(limits=Limits(max_connections=40)) as client:
+    asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+    async with AsyncClient(limits=Limits(max_connections=10)) as client:
         aws = [asyncio.create_task(request_api(client, i)) for i in range(REQUESTS)]
         t = time.time()
         print(t, 'start')
